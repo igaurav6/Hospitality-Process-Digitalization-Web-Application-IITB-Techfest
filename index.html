@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospitality Process Digitalization</title>
+</head>
+<body>
+    <h1>Upload CSV Files</h1>
+    <form id="groups-form">
+        <label for="groups-file">Upload Groups CSV:</label>
+        <input type="file" id="groups-file" name="file" required>
+        <button type="submit">Upload</button>
+    </form>
+    
+    <form id="hostels-form">
+        <label for="hostels-file">Upload Hostels CSV:</label>
+        <input type="file" id="hostels-file" name="file" required>
+        <button type="submit">Upload</button>
+    </form>
+
+    <button id="allocate-btn">Allocate Rooms</button>
+
+    <script>
+        document.getElementById('groups-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let formData = new FormData();
+            formData.append('file', document.getElementById('groups-file').files[0]);
+            fetch('/upload_groups', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+              .then(data => alert(data.message));
+        });
+
+        document.getElementById('hostels-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            let formData = new FormData();
+            formData.append('file', document.getElementById('hostels-file').files[0]);
+            fetch('/upload_hostels', {
+                method: 'POST',
+                body: formData
+            }).then(response => response.json())
+              .then(data => alert(data.message));
+        });
+
+        document.getElementById('allocate-btn').addEventListener('click', function() {
+            fetch('/allocate_rooms').then(response => response.blob())
+                .then(blob => {
+                    let url = window.URL.createObjectURL(blob);
+                    let a = document.createElement('a');
+                    a.href = url;
+                    a.download = "allocation.csv";
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                });
+        });
+    </script>
+</body>
+</html>
